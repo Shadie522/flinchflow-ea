@@ -11,7 +11,7 @@ from telegram import Bot
 # Enable logging
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 
-# Configuration & Credentials (Pulled securely from Environment Variables)
+# Configuration & Credentials (Pulled securely from Render Environment Variables)
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 CHAT_ID = os.environ.get("CHAT_ID")
 DERIV_API_TOKEN = os.environ.get("DERIV_API_TOKEN")
@@ -95,12 +95,12 @@ async def run_trading_bot():
     }
     
     backoff = 3
-    extra_headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
 
     while is_running:
         try:
             logging.info("Connecting to Deriv via single unified WebSocket...")
-            async with websockets.connect(WS_URL, extra_headers=extra_headers, ping_interval=20, ping_timeout=20) as websocket:
+            # Clean connection without extra_headers blocking Render's event loop
+            async with websockets.connect(WS_URL, ping_interval=20, ping_timeout=20) as websocket:
                 backoff = 3  
                 
                 # 1. Authorize
