@@ -11,24 +11,24 @@ from telegram import Bot
 # Enable logging
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 
-# Configuration & Credentials
-TELEGRAM_TOKEN = "8876031603:AAFtSV0WxheTkU3TTRuWRIsim4k_Lo742Yc"
-CHAT_ID = "6475916836"
-
-# Updated with your new token
-DERIV_API_TOKEN = "34HxnztFbO89FDrXaFi7P"
+# Configuration & Credentials (Pulled securely from Environment Variables)
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
+CHAT_ID = os.environ.get("CHAT_ID")
+DERIV_API_TOKEN = os.environ.get("DERIV_API_TOKEN")
 WS_URL = "wss://ws.derivws.com/websockets/v3?app_id=1089"
 
 # Portfolio Risk Management Limits
 DAILY_PROFIT_TARGET = 60.0  
 DAILY_STOP_LOSS = 30.0    
 
-bot = Bot(token=TELEGRAM_TOKEN)
+bot = Bot(token=TELEGRAM_TOKEN) if TELEGRAM_TOKEN else None
 shared_pnl = 0.0
 initial_balance = None
 is_running = True
 
 async def send_telegram_alert(message):
+    if not bot:
+        return
     try:
         await bot.send_message(chat_id=CHAT_ID, text=message, parse_mode="Markdown")
     except Exception as e:
